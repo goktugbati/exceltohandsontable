@@ -2,6 +2,7 @@ package com.excel.demo.service;
 
 import com.excel.demo.model.SheetModel;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -9,9 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -104,7 +103,27 @@ public class ExcelPOIHelper {
     }
 
 
-    public void updateExcel(int sheetNumber, String cellContent, int rowNumber, int cellNumber){
+    public void updateExcelFile(String fileLocation,
+                                int sheetNumber,
+                                String cellContent,
+                                int rowIndex,
+                                int cellIndex) throws IOException {
+        //Converts File to an InputStream
+        FileInputStream fis = new FileInputStream(new File(fileLocation));
+        XSSFWorkbook workbook = new XSSFWorkbook(fis);
+        XSSFSheet sheet = workbook.getSheetAt(sheetNumber);
+        Row row = sheet.getRow(rowIndex);
+        Cell cell = row.getCell(cellIndex);
+        if(cell == null){
+            cell = row.createCell(cellIndex);
+        }
+        cell.setCellValue(cellContent);
+
+        fis.close();
+
+        FileOutputStream outFile =new FileOutputStream(new File(fileLocation));
+        workbook.write(outFile);
+        outFile.close();
 
     }
 

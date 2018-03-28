@@ -82,6 +82,7 @@ public class MainController {
                 }
                 model.addAttribute("data", dataList);
                 model.addAttribute("columnNames", columnNames);
+                model.addAttribute("sheetNo", sheetNo);
             } else {
                 model.addAttribute("message", "Not a valid excel file!");
             }
@@ -90,4 +91,20 @@ public class MainController {
         }
         return "excel";
     }
+
+    @PostMapping(value = "/updateexcel")
+    public void updateExcel(@RequestParam int sheetNo,
+                              @RequestParam int rowIndex,
+                              @RequestParam int cellIndex,
+                              @RequestParam String cellContent){
+        try {
+            excelPOIHelper.updateExcelFile(fileLocation, sheetNo, cellContent, rowIndex, cellIndex);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+
 }

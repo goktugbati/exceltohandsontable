@@ -10,11 +10,6 @@
     <title>Title</title>
 
 
-    <!-- Bootstrap core CSS -->
-    <link href="../../../../dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="starter-template.css" rel="stylesheet">
 
 </head>
 <body>
@@ -51,14 +46,14 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="../../../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
-<script src="../../../../assets/js/vendor/popper.min.js"></script>
-<script src="../../../../dist/js/bootstrap.min.js"></script>
+
 
 <script th:inline="javascript">
     var data = /*[[${data}]]*/ 'default';
     var columnNames = /*[[${columnNames}]]*/ 'default';
+    var sheetNo = /*[[${sheetNo}]]*/ 'default';
 
     var dataList = [];
     for(d in data){
@@ -67,13 +62,39 @@
         }
     }
 
+    document.addEventListener("DOMContentLoaded", function() {
+        var container = document.getElementById('example');
+        var rowIndex = 0;
+        var cellIndex = 0;
+        var cellContent = "";
 
-    var container = document.getElementById('example');
-    var hot = new Handsontable(container, {
-        data: data,
-        rowHeaders: true,
-        observeChanges: true,
-        colHeaders: columnNames
+        var hot = new Handsontable(container, {
+            data: data,
+            rowHeaders: true,
+            colHeaders: columnNames,
+            beforeChange: function(source, changes){
+                rowIndex = source[0][0]+1;
+                cellIndex = source[0][1];
+                cellContent = source[0][3];
+                console.log(rowIndex);
+                console.log(cellIndex);
+                console.log(cellContent);
+            },
+            afterChange: function(src, changes){
+                if(changes !== 'loadData'){
+                    $.post(
+                        "/updateexcel",
+                        {   sheetNo : sheetNo,
+                            rowIndex : rowIndex,
+                            cellIndex : cellIndex,
+                            cellContent : cellContent
+                        });
+                }
+            }
+
+        });
+
+
     });
 
 </script>
